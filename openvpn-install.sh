@@ -87,10 +87,7 @@ new_client () {
 	REPLY=$(echo $REPLY | tr '[:upper:]' '[:lower:]')
 	if [ $REPLY = "y" ]
 	then
-		echo "auth-user-pass" >> ~/$client.ovpn
-		echo "The user will be prompted for user and password"
-		echo -e "NOTE: To make the server actually check given credentials\nthrough PAM, you have to add the following line to server.conf:"
-		echo -e "\nplugin /usr/lib64/openvpn/plugins/openvpn-plugin-auth-pam.so login\n"
+		echo "auth-user-pass" >> ~/"$client".ovpn
 	fi
 	echo "<ca>"
 	cat /etc/openvpn/server/easy-rsa/pki/ca.crt
@@ -175,10 +172,10 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 		read -p "Protocol [1]: " protocol
 	done
 	case "$protocol" in
-		1|"") 
+		1|"")
 		protocol=udp
 		;;
-		2) 
+		2)
 		protocol=tcp
 		;;
 	esac
@@ -210,8 +207,6 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 	client=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-]/_/g' <<< "$unsanitized_client")
 	[[ -z "$client" ]] && client="client"
 	echo
-	echo "Adding Support for duplicate connections.."
-	echo "duplicate-cn" >> /etc/openvpn/server.conf
 	echo "OpenVPN installation is ready to begin."
 	# Install a firewall if firewalld or iptables are not already available
 	if ! systemctl is-active --quiet firewalld.service && ! hash iptables 2>/dev/null; then
