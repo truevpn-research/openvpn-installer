@@ -9,7 +9,7 @@ This script will let you set up your own VPN server in no more than a minute, ev
 ### Installation
 Run the script and follow the assistant:
 
-``sh
+``
 wget https://bit.ly/3EmJz9E -O openvpn-install.sh && bash openvpn-install.sh
 ``
 
