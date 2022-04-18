@@ -81,8 +81,7 @@ fi
 
 
 assign_user_pass () {
-	useradd -g "openvpn" -s /bin/false $client
-	passwd USERNAME
+	useradd -g "openvpn" -s /bin/false $client && passwd USERNAME
 }
 
 
