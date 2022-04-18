@@ -80,7 +80,7 @@ TUN needs to be enabled before running this installer."
 fi
 
 create_groups() {
-	touch /etc/pam.d/openvpn
+	# touch /etc/pam.d/openvpn
 	# groupadd openvpn
 }
 assign_user_pass () {
