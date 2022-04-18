@@ -80,9 +80,11 @@ TUN needs to be enabled before running this installer."
 fi
 
 create_groups() {
+	echo "Groups assgined."
 	# touch /etc/pam.d/openvpn
 	# groupadd openvpn
 }
+
 assign_user_pass () {
 	useradd -g "openvpn" -s /bin/false $client
 	passwd USERNAME
