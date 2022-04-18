@@ -79,7 +79,10 @@ TUN needs to be enabled before running this installer."
 	exit
 fi
 
-
+create_base_usergroup() {
+	touch /etc/pam.d/openvpn
+	groupadd openvpn
+}
 assign_user_pass () {
 	 useradd -g "openvpn" -s /bin/false $client
 	 echo
@@ -447,6 +450,9 @@ auth-user-pass" > /etc/openvpn/server/client-common.txt
 	# Enable and start the OpenVPN service
 	systemctl enable --now openvpn-server@server.service
 	# Generates the custom client.ovpn
+	create_base_usergroup
+	echo
+	echo "Base Groups created!"
 	new_client
 	echo
 	echo "Finished!"
