@@ -87,7 +87,7 @@ new_client () {
 	REPLY=$(echo $REPLY | tr '[:upper:]' '[:lower:]')
 	if [ $REPLY = "y" ]
 	then
-		echo "auth-user-pass" >> ~/"$client".ovpn
+		echo "auth-user-pass" > ~/"$client".ovpn
 	fi
 	echo "<ca>"
 	cat /etc/openvpn/server/easy-rsa/pki/ca.crt
@@ -334,7 +334,15 @@ group $group_name
 persist-key
 persist-tun
 verb 3
-crl-verify crl.pem" >> /etc/openvpn/server/server.conf
+# +--------- user-pass authentication ------ +
+duplicate-cn
+reneg-sec 0
+plugin /usr/lib/x86_64-linux-gnu/openvpn/plugins/openvpn-plugin-auth-pam.so openvpn
+verify-client-cert optional
+username-as-common-name
+# +----------------------------------------- +
+# Uncomment this to allow authentication by cert.
+#crl-verify crl.pem" >> /etc/openvpn/server/server.conf
 	if [[ "$protocol" = "udp" ]]; then
 		echo "explicit-exit-notify" >> /etc/openvpn/server/server.conf
 	fi
@@ -447,9 +455,10 @@ else
 	echo
 	echo "Select an option:"
 	echo "   1) Add a new client"
-	echo "   2) Revoke an existing client"
-	echo "   3) Remove OpenVPN"
-	echo "   4) Exit"
+	echo "	 2) assign a password for a client"
+	echo "   3) Revoke an existing client"
+	echo "   4) Remove OpenVPN"
+	echo "   5) Exit"
 	read -p "Option: " option
 	until [[ "$option" =~ ^[1-4]$ ]]; do
 		echo "$option: invalid selection."
@@ -475,6 +484,21 @@ else
 			exit
 		;;
 		2)
+		echo
+		echo "Client name:"
+		read -p "Name: " unsanitized_client
+		client=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-]/_/g' <<< "$unsanitized_client")
+		while [[ -z "$client" || -e /etc/openvpn/server/easy-rsa/pki/issued/"$client".crt ]]; do
+			echo "$client: invalid name."
+			read -p "Name: " unsanitized_client
+			client=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-]/_/g' <<< "$unsanitized_client")
+		done
+		useradd -g "openvpn" -s /bin/false $client && passwd USERNAME
+		echo
+		echo "user and password assigned for $client - group: openvpn "
+		exit
+		;;
+		3)
 			# This option could be documented a bit better and maybe even be simplified
 			# ...but what can I say, I want some sleep too
 			number_of_clients=$(tail -n +2 /etc/openvpn/server/easy-rsa/pki/index.txt | grep -c "^V")
@@ -514,7 +538,7 @@ else
 			fi
 			exit
 		;;
-		3)
+		4)
 			echo
 			read -p "Confirm OpenVPN removal? [y/N]: " remove
 			until [[ "$remove" =~ ^[yYnN]*$ ]]; do
@@ -566,7 +590,7 @@ else
 			fi
 			exit
 		;;
-		4)
+		5)
 			exit
 		;;
 	esac
