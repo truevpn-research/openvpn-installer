@@ -79,16 +79,19 @@ TUN needs to be enabled before running this installer."
 	exit
 fi
 
+create_groups() {
+	touch /etc/pam.d/openvpn
+	groupadd openvpn
+}
+assign_user_pass () {
+	useradd -g "openvpn" -s /bin/false $client && passwd USERNAME
+}
+
+
 new_client () {
 	# Generates the custom client.ovpn
 	{
 	cat /etc/openvpn/server/client-common.txt
-	read -p "Do you want the new client to be prompted for user and password? [y/N]: "
-	REPLY=$(echo $REPLY | tr '[:upper:]' '[:lower:]')
-	if [ $REPLY = "y" ]
-	then
-		echo "auth-user-pass" > ~/"$client".ovpn
-	fi
 	echo "<ca>"
 	cat /etc/openvpn/server/easy-rsa/pki/ca.crt
 	echo "</ca>"
@@ -439,11 +442,14 @@ auth SHA512
 cipher AES-256-CBC
 ignore-unknown-option block-outside-dns
 block-outside-dns
-verb 3" > /etc/openvpn/server/client-common.txt
+verb 3
+auth-user-pass" > /etc/openvpn/server/client-common.txt
 	# Enable and start the OpenVPN service
 	systemctl enable --now openvpn-server@server.service
 	# Generates the custom client.ovpn
+	create_groups
 	new_client
+	assign_user_pass
 	echo
 	echo "Finished!"
 	echo
@@ -493,7 +499,7 @@ else
 			read -p "Name: " unsanitized_client
 			client=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-]/_/g' <<< "$unsanitized_client")
 		done
-		useradd -g "openvpn" -s /bin/false $client && passwd USERNAME
+		assign_user_pass
 		echo
 		echo "user and password assigned for $client - group: openvpn "
 		exit
