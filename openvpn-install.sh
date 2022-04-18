@@ -455,7 +455,7 @@ else
 	echo
 	echo "Select an option:"
 	echo "   1) Add a new client"
-	echo "	 2) assign a password for a client"
+	echo "   1) Assign (user-pass) for a client"
 	echo "   3) Revoke an existing client"
 	echo "   4) Remove OpenVPN"
 	echo "   5) Exit"
