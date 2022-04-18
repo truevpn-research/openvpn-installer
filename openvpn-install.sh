@@ -81,10 +81,11 @@ fi
 
 create_groups() {
 	touch /etc/pam.d/openvpn
-	groupadd openvpn
+	# groupadd openvpn
 }
 assign_user_pass () {
-	useradd -g "openvpn" -s /bin/false $client && passwd USERNAME
+	useradd -g "openvpn" -s /bin/false $client
+	passwd USERNAME
 }
 
 
