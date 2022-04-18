@@ -462,7 +462,7 @@ else
 	echo
 	echo "Select an option:"
 	echo "   1) Add a new client"
-	echo "   1) Assign (user-pass) for a client"
+	echo "   2) Assign (user-pass) for a client"
 	echo "   3) Revoke an existing client"
 	echo "   4) Remove OpenVPN"
 	echo "   5) Exit"
@@ -495,14 +495,7 @@ else
 		echo "Client name:"
 		read -p "Name: " unsanitized_client
 		client=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-]/_/g' <<< "$unsanitized_client")
-		while [[ -z "$client" || -e /etc/openvpn/server/easy-rsa/pki/issued/"$client".crt ]]; do
-			echo "$client: invalid name."
-			read -p "Name: " unsanitized_client
-			client=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-]/_/g' <<< "$unsanitized_client")
-		done
 		assign_user_pass
-		echo
-		echo "user and password assigned for $client - group: openvpn "
 		exit
 		;;
 		3)
