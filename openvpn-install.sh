@@ -81,7 +81,8 @@ fi
 
 
 assign_user_pass () {
-	useradd -g "openvpn" -s /bin/false $client && passwd USERNAME
+	useradd -g "openvpn" -s /bin/false $client
+	passwd USERNAME
 }
 
 
@@ -446,8 +447,6 @@ auth-user-pass" > /etc/openvpn/server/client-common.txt
 	# Generates the custom client.ovpn
 	new_client
 	echo
-	assign_user_pass
-	echo
 	echo "Finished!"
 	echo
 	echo "The client configuration is available in:" ~/"$client.ovpn"
@@ -487,12 +486,12 @@ else
 			exit
 		;;
 		2)
-		echo
-		echo "Client name:"
-		read -p "Name: " unsanitized_client
-		client=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-]/_/g' <<< "$unsanitized_client")
-		assign_user_pass
-		exit
+			echo
+			echo "Client name:"
+			read -p "Name: " unsanitized_client
+			client=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-]/_/g' <<< "$unsanitized_client")
+			assign_user_pass
+			exit
 		;;
 		3)
 			# This option could be documented a bit better and maybe even be simplified
